@@ -58,6 +58,49 @@ class UI {
   }
 }
 
+//Local Storage class
+class Store {
+  static getBooks(){
+    //Gets books from local storage
+    let books;
+    if(localStorage.getItem('books') === null) {
+      books = [];
+    } else {
+      books = JSON.parse(localStorage.getItem('books'));
+    }
+    return books;
+  }
+
+  static displayBooks(){
+    //Display the books from the local storage to the screen
+    const books = Store.getBooks();
+
+    books.forEach(function(book){
+      const ui = new UI();
+
+      //Add book to UI
+      ui.addBookToList(book);
+    });
+  }
+
+  static addBook(book){
+    //Adds the books to the local storage and saves it
+    const books = Store.getBooks();
+
+    books.push(book);
+
+    localStorage.setItem('books', JSON.stringify(books));
+  }
+
+  static removeBook(isbn){
+    //Removes the book from the local storage
+    console.log(isbn);
+  }
+}
+
+//DOM LOAD EVENT
+document.addEventListener('DOMContentLoader', Store.displayBooks);
+
 //Event listeners
 document.getElementById('book-form').addEventListener('submit',
   function(e){
@@ -80,6 +123,9 @@ document.getElementById('book-form').addEventListener('submit',
       //Add book to list
       ui.addBookToList(book);
 
+      //Add tp Local Storage
+      Store.addBook(book);
+
       //Show success
       ui.showAlert('Book Added!', 'success');
 
@@ -101,6 +147,10 @@ document.getElementById('book-form').addEventListener('submit',
 
     //Delete Book
     ui.deleteBook(e.target);
+
+    //Remove from Local Storage
+    //e.target is the a tags | it is the list <td> where the a tags and icon are held | the one before it  
+    Store.removeBook(e.target.parentElement.previousElementSibling.textContent);
 
     //Show message
     ui.showAlert('Book Removed!', 'success');
